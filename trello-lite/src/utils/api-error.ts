@@ -1,11 +1,16 @@
 import { HTTP_CODE } from '@/constants';
 
+export const HTTP_CODE_TO_STRING: Record<number, string> = Object.fromEntries(
+  Object.entries(HTTP_CODE).map(([key, value]) => [value, key]),
+);
+
 /**
  * Custom application error class that extends the built-in Error.
  * Attaches an HTTP status code to each error for use in API responses.
  */
 export class ApiError extends Error {
   public readonly statusCode: number;
+  public readonly errorCode: string;
 
   /**
    * @param message - Human-readable error description
@@ -15,6 +20,7 @@ export class ApiError extends Error {
     super(message);
     this.name = 'ApiError';
     this.statusCode = statusCode;
+    this.errorCode = HTTP_CODE_TO_STRING[statusCode] ?? 'INTERNAL_SERVER_ERROR';
   }
 
   // Static factory methods for common HTTP errors
