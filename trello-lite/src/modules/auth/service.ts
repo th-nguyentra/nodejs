@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ApiError } from '@/utils';
-import { RegisterDTO } from './dto';
+import { LoginDTO, RegisterDTO } from './dto';
 import { AuthRepository } from './repository';
 import { MESSAGES, SALT_ROUNDS } from '@/constants';
 import { env } from '@/configs';
@@ -27,6 +27,23 @@ export const AuthService = {
       username,
       password: hashedPassword,
     });
+
+    const { password: _, ...safeUser } = user;
+
+    return { data: safeUser, access: generateAuthToken(user.id) };
+  },
+  login: async ({ email, password }: LoginDTO) => {
+    const user = await AuthRepository.findByEmail(email);
+
+    if (!user) {
+      throw ApiError.unauthorized(MESSAGES.AUTH.INVALID_CREDENTIALS);
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      throw ApiError.unauthorized(MESSAGES.AUTH.INVALID_CREDENTIALS);
+    }
 
     const { password: _, ...safeUser } = user;
 

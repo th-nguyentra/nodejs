@@ -10,4 +10,10 @@ export const registerSchema = z.object({
     .max(30, MESSAGES.AUTH.USERNAME_TOO_LONG),
 });
 
+export const loginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(6, MESSAGES.AUTH.PASSWORD_TOO_SHORT),
+});
+
 export type RegisterDTO = z.infer<typeof registerSchema>;
+export type LoginDTO = z.infer<typeof loginSchema>;
