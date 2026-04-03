@@ -11,7 +11,7 @@ export const env = {
   testDatabaseUrl: process.env.DATABASE_URL_TEST ?? '',
   jwt: {
     secret: process.env.JWT_SECRET ?? '',
-    expiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
+    expiresIn: parseInt(process.env.JWT_EXPIRES_IN ?? '604800', 10),
   },
   sendgrid: {
     apiKey: process.env.SENDGRID_API_KEY ?? '',

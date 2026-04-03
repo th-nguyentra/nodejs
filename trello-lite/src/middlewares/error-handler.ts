@@ -1,4 +1,4 @@
-import { HTTP_MESSAGE } from '@/constants';
+import { MESSAGES } from '@/constants';
 import { ApiError } from '@/utils';
 import { NextFunction, Request, Response } from 'express';
 
@@ -16,17 +16,15 @@ export const errorHandler = (
   // Operational error — safe to expose message and status code to the client
   if (err instanceof ApiError) {
     res.status(err.statusCode).json({
-      success: false,
-      message: err.message,
+      errors: { code: err.errorCode, message: err.message },
     });
 
     return;
   }
 
   // Unexpected error — hide internal details, return generic 500
-  const { statusCode, message } = ApiError.internal(HTTP_MESSAGE.INTERNAL_SERVER_ERROR);
+  const { statusCode, errorCode, message } = ApiError.internal(MESSAGES.INTERNAL_SERVER_ERROR);
   res.status(statusCode).json({
-    success: false,
-    message,
+    errors: { code: errorCode, message },
   });
 };
