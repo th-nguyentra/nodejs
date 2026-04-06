@@ -1,10 +1,16 @@
 import { Role } from '../../../generated/prisma/client';
-import { GetBoardsQuery } from './board.dto';
+import { CreateBoardDTO, GetBoardsQuery } from './board.dto';
 import { BoardRepository } from './board.repository';
 import { ApiError } from '@/utils';
 import { MESSAGES } from '@/constants';
 
 export const BoardService = {
+  createBoard: async (data: CreateBoardDTO, user: { id: string; role: Role }) => {
+    if (user.role !== Role.ADMIN) throw ApiError.forbidden(MESSAGES.FORBIDDEN);
+
+    return BoardRepository.createBoard({ ...data, createdBy: user.id });
+  },
+
   getBoardById: async (id: string, user: { id: string; role: Role }) => {
     const board = await BoardRepository.findBoardById(id);
 

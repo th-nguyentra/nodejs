@@ -1,5 +1,6 @@
 export const MESSAGES = {
   INTERNAL_SERVER_ERROR: 'Internal Server Error',
+  FORBIDDEN: 'You do not have permission to perform this action',
   VALIDATION_FAILED: 'The provided data is invalid.',
   EMPTY_BODY: 'Request body is required',
 
