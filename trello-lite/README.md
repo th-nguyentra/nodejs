@@ -65,22 +65,31 @@ Trello Lite is a RESTful backend API that provides:
 ```
 trello-lite/
 ├── prisma/
-│   └── schema.prisma         # Database schema
+│   ├── migrations/           # Database migration files
+│   ├── schema.prisma         # Database schema
+│   └── seed.ts               # Seed data
 ├── src/
-│   ├── configs/              # App configuration (db, swagger, etc.)
+│   ├── configs/              # App configuration (db, env, swagger, etc.)
 │   ├── constants/            # Shared constants and enums
-│   ├── controllers/          # Route handlers
-│   ├── dtos/                 # Data Transfer Objects (request/response shapes)
 │   ├── middlewares/          # Express middlewares (auth, error handling, etc.)
-│   ├── repositories/         # Database access layer (Prisma queries)
-│   ├── routes/               # Route definitions
-│   ├── services/             # Business logic
+│   ├── modules/              # Feature modules (each contains its own controller, service, etc.)
+│   │   ├── auth/
+│   │   │   ├── controller.ts
+│   │   │   ├── dto.ts
+│   │   │   ├── repository.ts
+│   │   │   ├── route.ts
+│   │   │   └── service.ts
+│   │   └── etc...
+│   ├── types/                # Custom TypeScript type declarations
 │   ├── utils/                # Utility/helper functions
 │   ├── app.ts                # Express app setup
 │   └── server.ts             # Server entry point
 ├── .husky/                   # Git hooks
-├── commitlint.config.js      # Commit message convention
+├── commitlint.config.ts      # Commit message convention
 ├── eslint.config.mjs         # ESLint configuration
+├── jest.config.ts            # Jest configuration
+├── lint-staged.config.ts     # Lint-staged configuration
+├── prisma.config.ts          # Prisma configuration
 ├── tsconfig.json             # TypeScript configuration
 └── package.json
 ```
@@ -92,7 +101,8 @@ trello-lite/
 ### Prerequisites
 
 - Node.js >= 18
-- PostgreSQL
+- pnpm
+- Docker
 - A SendGrid API key (for invitation emails)
 
 ### Installation
@@ -104,16 +114,38 @@ cd trello-lite
 
 # Install dependencies
 pnpm install
+
+# Copy env
+cp .env.example .env
+# Then fill in the values in .env
 ```
 
 ### Database Setup
 
 ```bash
+# Start dev database
+pnpm db:up
+
+# Start test database
+pnpm db:test:up
+```
+
+Update your `.env`:
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/trello_lite
+TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5433/trello_lite_test
+```
+
+```bash
+# Generate Prisma client
+pnpm db:generate
+
 # Run migrations
-pnpm prisma migrate dev
+pnpm db:migrate
 
 # Seed initial data
-pnpm prisma db seed
+pnpm db:seed
 ```
 
 ### Running the Server

@@ -1,17 +1,16 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ApiError } from '@/utils';
-import { LoginDTO, RegisterDTO } from './dto';
-import { AuthRepository } from './repository';
+import { LoginDTO, RegisterDTO } from './auth.dto';
+import { AuthRepository } from './auth.repository';
 import { MESSAGES, SALT_ROUNDS } from '@/constants';
 import { env } from '@/configs';
 
-const generateAuthToken = (userId: string) =>
-  jwt.sign({ userId }, env.jwt.secret, {
-    expiresIn: env.jwt.expiresIn,
-  });
-
 export const AuthService = {
+  generateAuthToken: (userId: string) =>
+    jwt.sign({ userId }, env.jwt.secret, {
+      expiresIn: env.jwt.expiresIn,
+    }),
   register: async ({ email, username, password }: RegisterDTO) => {
     const existingUser = await AuthRepository.findByUsernameOrEmail(username, email);
 
@@ -30,13 +29,13 @@ export const AuthService = {
 
     const { password: _, ...safeUser } = user;
 
-    return { data: safeUser, access: generateAuthToken(user.id) };
+    return { data: safeUser, access: AuthService.generateAuthToken(user.id) };
   },
   login: async ({ email, password }: LoginDTO) => {
     const user = await AuthRepository.findByEmail(email);
 
     if (!user) {
-      throw ApiError.unauthorized(MESSAGES.AUTH.INVALID_CREDENTIALS);
+      throw ApiError.notFound(MESSAGES.AUTH.USER_NOT_FOUND);
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -47,6 +46,6 @@ export const AuthService = {
 
     const { password: _, ...safeUser } = user;
 
-    return { data: safeUser, access: generateAuthToken(user.id) };
+    return { data: safeUser, access: AuthService.generateAuthToken(user.id) };
   },
 };

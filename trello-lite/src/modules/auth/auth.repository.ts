@@ -1,5 +1,5 @@
 import { prisma } from '@/configs';
-import { RegisterDTO } from './dto';
+import { RegisterDTO } from './auth.dto';
 
 export const AuthRepository = {
   findByEmail: (email: string) => prisma.user.findUnique({ where: { email } }),
