@@ -2,9 +2,10 @@ import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import swaggerUi from 'swagger-ui-express';
 
-import { swaggerSpec } from '@/configs';
+import { passport, swaggerSpec } from '@/configs';
 import { errorHandler, requestLogger } from '@/middlewares';
-import { AuthRouter } from './modules/auth/route';
+import { AuthRouter } from './modules/auth/auth.route';
+import { BoardRouter } from './modules/board/board.route';
 
 const app = express();
 
@@ -18,11 +19,15 @@ app.set('json spaces', 2);
 // Logging
 app.use(requestLogger);
 
+// Passport
+app.use(passport.initialize());
+
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/v1', AuthRouter);
+app.use('/api/v1', BoardRouter);
 
 // Global error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
