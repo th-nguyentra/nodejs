@@ -10,6 +10,25 @@ const buildWhere = ({ search, userId }: Pick<FindBoardsOptions, 'search' | 'user
 });
 
 export const BoardRepository = {
+  findBoardById: (id: string) => {
+    return prisma.board.findUnique({
+      where: { id, deletedAt: null },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        createdAt: true,
+        updatedAt: true,
+        members: {
+          select: {
+            id: true,
+            user: { select: { id: true, username: true } },
+          },
+        },
+      },
+    });
+  },
+
   findBoards: ({ search, page, limit, userId }: FindBoardsOptions) => {
     const where = buildWhere({ search, userId });
     const skip = (page - 1) * limit;

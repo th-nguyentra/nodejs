@@ -10,4 +10,9 @@ export const BoardController = {
 
     res.status(HTTP_CODE.OK).json(result);
   },
+
+  getBoardById: async (req: Request, res: Response) => {
+    const result = await BoardService.getBoardById(req.params.id as string, req.user!);
+    res.status(HTTP_CODE.OK).json(result);
+  },
 };
