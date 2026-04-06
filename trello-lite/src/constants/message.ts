@@ -11,5 +11,10 @@ export const MESSAGES = {
     USERNAME_REQUIRED: 'Username is required',
     USERNAME_TOO_SHORT: 'Username must be at least 3 characters long',
     USERNAME_TOO_LONG: 'Username must be at most 30 characters long',
+    MISSING_TOKEN: 'Authorization token is required',
+    INVALID_TOKEN: 'Invalid or expired token',
+  },
+  BOARD: {
+    NOT_FOUND: 'Board not found',
   },
 };
