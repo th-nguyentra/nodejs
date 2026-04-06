@@ -1,8 +1,29 @@
 import { Role } from '../../../generated/prisma/client';
 import { GetBoardsQuery } from './board.dto';
 import { BoardRepository } from './board.repository';
+import { ApiError } from '@/utils';
+import { MESSAGES } from '@/constants';
 
 export const BoardService = {
+  getBoardById: async (id: string, user: { id: string; role: Role }) => {
+    const board = await BoardRepository.findBoardById(id);
+
+    if (!board) throw ApiError.notFound(MESSAGES.BOARD.NOT_FOUND);
+
+    const isMember = board.members.some((member) => member.user.id === user.id);
+    if (user.role !== Role.ADMIN && !isMember) {
+      throw ApiError.forbidden(MESSAGES.BOARD.NOT_FOUND);
+    }
+
+    return {
+      id: board.id,
+      name: board.name,
+      description: board.description,
+      createdAt: board.createdAt,
+      updatedAt: board.updatedAt,
+    };
+  },
+
   getBoards: async (query: GetBoardsQuery, user: { id: string; role: Role }) => {
     const isAdmin = user.role === Role.ADMIN;
     const [boards, total] = await BoardRepository.findBoards({

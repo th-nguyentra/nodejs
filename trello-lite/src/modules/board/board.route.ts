@@ -75,4 +75,57 @@ router.get(
   BoardController.getBoards,
 );
 
+/**
+ * @openapi
+ * /boards/{id}:
+ *   get:
+ *     tags: [Boards]
+ *     summary: Get board detail
+ *     description: Returns full board detail. Admins can access any board; members can only access boards they belong to.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Board detail
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id: { type: string }
+ *                 name: { type: string }
+ *                 description: { type: string, nullable: true }
+ *                 createdAt: { type: string, format: date-time }
+ *                 updatedAt: { type: string, format: date-time }
+ *                 creator:
+ *                   type: object
+ *                   properties:
+ *                     id: { type: string }
+ *                     username: { type: string }
+ *                 members:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id: { type: string }
+ *                       user:
+ *                         type: object
+ *                         properties:
+ *                           id: { type: string }
+ *                           username: { type: string }
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.get('/boards/:id', authenticate, BoardController.getBoardById);
+
 export const BoardRouter = router;
