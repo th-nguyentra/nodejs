@@ -5,6 +5,7 @@ export const MESSAGES = {
 
   AUTH: {
     USER_ALREADY_EXISTS: 'Email or username already exists',
+    USER_NOT_FOUND: 'User not found. Please register first.',
     INVALID_CREDENTIALS: 'Invalid email or password',
     PASSWORD_TOO_SHORT: 'Password must be at least 6 characters long',
     USERNAME_REQUIRED: 'Username is required',

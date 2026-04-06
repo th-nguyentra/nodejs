@@ -1,6 +1,6 @@
 import { HTTP_CODE } from '@/constants';
 import { Request, Response } from 'express';
-import { AuthService } from './service';
+import { AuthService } from './auth.service';
 
 export const AuthController = {
   register: async (req: Request, res: Response) => {
