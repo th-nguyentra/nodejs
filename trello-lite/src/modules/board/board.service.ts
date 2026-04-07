@@ -1,5 +1,5 @@
 import { Role } from '../../../generated/prisma/client';
-import { CreateBoardDTO, GetBoardsQuery } from './board.dto';
+import { CreateBoardDTO, GetBoardsQuery, UpdateBoardDTO } from './board.dto';
 import { BoardRepository } from './board.repository';
 import { ApiError } from '@/utils';
 import { MESSAGES } from '@/constants';
@@ -9,6 +9,15 @@ export const BoardService = {
     if (user.role !== Role.ADMIN) throw ApiError.forbidden(MESSAGES.FORBIDDEN);
 
     return BoardRepository.createBoard({ ...data, createdBy: user.id });
+  },
+
+  updateBoard: async (id: string, data: UpdateBoardDTO, user: { id: string; role: Role }) => {
+    if (user.role !== Role.ADMIN) throw ApiError.forbidden(MESSAGES.FORBIDDEN);
+
+    const board = await BoardRepository.findBoardById(id);
+    if (!board) throw ApiError.notFound(MESSAGES.BOARD.NOT_FOUND);
+
+    return BoardRepository.updateBoard(id, data);
   },
 
   getBoardById: async (id: string, user: { id: string; role: Role }) => {

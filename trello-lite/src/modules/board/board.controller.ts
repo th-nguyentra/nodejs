@@ -1,6 +1,6 @@
 import { HTTP_CODE } from '@/constants';
 import { Request, Response } from 'express';
-import { createBoardSchema, getBoardsQuerySchema } from './board.dto';
+import { createBoardSchema, getBoardsQuerySchema, updateBoardSchema } from './board.dto';
 import { BoardService } from './board.service';
 
 export const BoardController = {
@@ -9,6 +9,13 @@ export const BoardController = {
     const result = await BoardService.createBoard(data, req.user!);
 
     res.status(HTTP_CODE.CREATED).json(result);
+  },
+
+  updateBoard: async (req: Request, res: Response) => {
+    const data = updateBoardSchema.parse(req.body);
+    const result = await BoardService.updateBoard(req.params.id as string, data, req.user!);
+
+    res.status(HTTP_CODE.OK).json(result);
   },
 
   getBoards: async (req: Request, res: Response) => {
