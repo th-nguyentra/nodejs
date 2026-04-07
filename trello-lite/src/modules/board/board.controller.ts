@@ -11,6 +11,11 @@ export const BoardController = {
     res.status(HTTP_CODE.CREATED).json(result);
   },
 
+  deleteBoard: async (req: Request, res: Response) => {
+    await BoardService.deleteBoard(req.params.id as string, req.user!);
+    res.status(HTTP_CODE.NO_CONTENT).send();
+  },
+
   updateBoard: async (req: Request, res: Response) => {
     const data = updateBoardSchema.parse(req.body);
     const result = await BoardService.updateBoard(req.params.id as string, data, req.user!);
