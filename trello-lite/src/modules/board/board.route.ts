@@ -1,7 +1,7 @@
 import { authenticate, validate } from '@/middlewares';
 import { Router } from 'express';
 import { BoardController } from './board.controller';
-import { createBoardSchema, getBoardsQuerySchema } from './board.dto';
+import { createBoardSchema, getBoardsQuerySchema, updateBoardSchema } from './board.dto';
 
 const router = Router();
 
@@ -106,11 +106,7 @@ router.post('/boards', authenticate, validate(createBoardSchema), BoardControlle
  *                     limit: { type: integer }
  *                     totalPages: { type: integer }
  *       401:
- *         description: Unauthorized
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         $ref: '#/components/responses/Unauthorized'
  */
 router.get(
   '/boards',
@@ -171,5 +167,54 @@ router.get(
  *         $ref: '#/components/responses/NotFound'
  */
 router.get('/boards/:id', authenticate, BoardController.getBoardById);
+
+/**
+ * @openapi
+ * /boards/{id}:
+ *   patch:
+ *     tags: [Boards]
+ *     summary: Update board (Admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 100
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Board updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id: { type: string }
+ *                 name: { type: string }
+ *                 description: { type: string, nullable: true }
+ *                 createdAt: { type: string, format: date-time }
+ *                 updatedAt: { type: string, format: date-time }
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.patch('/boards/:id', authenticate, validate(updateBoardSchema), BoardController.updateBoard);
 
 export const BoardRouter = router;

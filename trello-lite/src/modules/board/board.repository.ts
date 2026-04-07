@@ -1,5 +1,5 @@
 import { prisma } from '@/configs';
-import { CreateBoardDTO, GetBoardsQuery } from './board.dto';
+import { CreateBoardDTO, GetBoardsQuery, UpdateBoardDTO } from './board.dto';
 
 type CreateBoardData = CreateBoardDTO & { createdBy: string };
 type FindBoardsOptions = GetBoardsQuery & { userId?: string };
@@ -33,6 +33,19 @@ export const BoardRepository = {
       });
 
       return board;
+    }),
+
+  updateBoard: (id: string, data: UpdateBoardDTO) =>
+    prisma.board.update({
+      where: { id, deletedAt: null },
+      data,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     }),
 
   findBoardById: (id: string) =>
