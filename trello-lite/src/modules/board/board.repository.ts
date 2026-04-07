@@ -1,6 +1,7 @@
 import { prisma } from '@/configs';
-import { GetBoardsQuery } from './board.dto';
+import { CreateBoardDTO, GetBoardsQuery } from './board.dto';
 
+type CreateBoardData = CreateBoardDTO & { createdBy: string };
 type FindBoardsOptions = GetBoardsQuery & { userId?: string };
 
 const buildWhere = ({ search, userId }: Pick<FindBoardsOptions, 'search' | 'userId'>) => ({
@@ -10,8 +11,32 @@ const buildWhere = ({ search, userId }: Pick<FindBoardsOptions, 'search' | 'user
 });
 
 export const BoardRepository = {
-  findBoardById: (id: string) => {
-    return prisma.board.findUnique({
+  createBoard: (data: CreateBoardData) =>
+    prisma.$transaction(async (tx) => {
+      const board = await tx.board.create({
+        data: {
+          name: data.name,
+          description: data.description,
+          createdBy: data.createdBy,
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      await tx.boardMember.create({
+        data: { boardId: board.id, userId: data.createdBy },
+      });
+
+      return board;
+    }),
+
+  findBoardById: (id: string) =>
+    prisma.board.findUnique({
       where: { id, deletedAt: null },
       select: {
         id: true,
@@ -26,8 +51,7 @@ export const BoardRepository = {
           },
         },
       },
-    });
-  },
+    }),
 
   findBoards: ({ search, page, limit, userId }: FindBoardsOptions) => {
     const where = buildWhere({ search, userId });

@@ -1,9 +1,53 @@
 import { authenticate, validate } from '@/middlewares';
 import { Router } from 'express';
 import { BoardController } from './board.controller';
-import { getBoardsQuerySchema } from './board.dto';
+import { createBoardSchema, getBoardsQuerySchema } from './board.dto';
 
 const router = Router();
+
+/**
+ * @openapi
+ * /boards:
+ *   post:
+ *     tags: [Boards]
+ *     summary: Create a new board (Admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 100
+ *                 example: My Board
+ *               description:
+ *                 type: string
+ *                 example: Board description
+ *     responses:
+ *       201:
+ *         description: Board created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id: { type: string }
+ *                 name: { type: string }
+ *                 description: { type: string, nullable: true }
+ *                 createdAt: { type: string, format: date-time }
+ *                 updatedAt: { type: string, format: date-time }
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ */
+router.post('/boards', authenticate, validate(createBoardSchema), BoardController.createBoard);
 
 /**
  * @openapi
