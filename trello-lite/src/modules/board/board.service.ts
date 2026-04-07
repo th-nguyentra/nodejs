@@ -20,6 +20,15 @@ export const BoardService = {
     return BoardRepository.updateBoard(id, data);
   },
 
+  deleteBoard: async (id: string, user: { id: string; role: Role }) => {
+    if (user.role !== Role.ADMIN) throw ApiError.forbidden(MESSAGES.FORBIDDEN);
+
+    const board = await BoardRepository.findBoardById(id);
+    if (!board) throw ApiError.notFound(MESSAGES.BOARD.NOT_FOUND);
+
+    await BoardRepository.deleteBoard(id);
+  },
+
   getBoardById: async (id: string, user: { id: string; role: Role }) => {
     const board = await BoardRepository.findBoardById(id);
 

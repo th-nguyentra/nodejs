@@ -217,4 +217,31 @@ router.get('/boards/:id', authenticate, BoardController.getBoardById);
  */
 router.patch('/boards/:id', authenticate, validate(updateBoardSchema), BoardController.updateBoard);
 
+/**
+ * @openapi
+ * /boards/{id}:
+ *   delete:
+ *     tags: [Boards]
+ *     summary: Delete board (Admin only)
+ *     description: Soft-deletes the board, cancels all pending invitations, and soft-deletes all tasks.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Board deleted successfully
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.delete('/boards/:id', authenticate, BoardController.deleteBoard);
+
 export const BoardRouter = router;

@@ -1,12 +1,11 @@
 import { prisma } from '@/configs';
-import { CreateBoardDTO, GetBoardsQuery, UpdateBoardDTO } from './board.dto';
+import { InvitationStatus } from '../../../generated/prisma/enums';
+import { BoardWhereFilter, CreateBoardData, FindBoardsOptions, UpdateBoardDTO } from './board.dto';
+import { QueryMode, SortOrder } from '@/constants';
 
-type CreateBoardData = CreateBoardDTO & { createdBy: string };
-type FindBoardsOptions = GetBoardsQuery & { userId?: string };
-
-const buildWhere = ({ search, userId }: Pick<FindBoardsOptions, 'search' | 'userId'>) => ({
+const buildBoardWhere = ({ search, userId }: BoardWhereFilter) => ({
   deletedAt: null,
-  ...(search && { name: { contains: search, mode: 'insensitive' as const } }),
+  ...(search && { name: { contains: search, mode: QueryMode.insensitive } }),
   ...(userId && { members: { some: { userId } } }),
 });
 
@@ -66,8 +65,24 @@ export const BoardRepository = {
       },
     }),
 
+  deleteBoard: (id: string) =>
+    prisma.$transaction([
+      prisma.board.update({
+        where: { id, deletedAt: null },
+        data: { deletedAt: new Date() },
+      }),
+      prisma.invitation.updateMany({
+        where: { boardId: id, status: InvitationStatus.PENDING },
+        data: { status: InvitationStatus.CANCELLED },
+      }),
+      prisma.task.updateMany({
+        where: { boardId: id, deletedAt: null },
+        data: { deletedAt: new Date() },
+      }),
+    ]),
+
   findBoards: ({ search, page, limit, userId }: FindBoardsOptions) => {
-    const where = buildWhere({ search, userId });
+    const where = buildBoardWhere({ search, userId });
     const skip = (page - 1) * limit;
 
     return Promise.all([
@@ -75,7 +90,7 @@ export const BoardRepository = {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: SortOrder.desc },
         select: {
           id: true,
           name: true,
