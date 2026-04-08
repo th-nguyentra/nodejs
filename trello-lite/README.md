@@ -190,7 +190,7 @@ NODE_ENV=development
 
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/trello_lite
-DATABASE_URL_TEST=postgresql://user:password@localhost:5432/trello_lite_test
+TEST_DATABASE_URL=postgresql://user:password@localhost:5433/trello_lite_test
 
 # JWT
 JWT_SECRET=your_jwt_secret
@@ -198,8 +198,10 @@ JWT_EXPIRES_IN=7d
 
 # SendGrid
 SENDGRID_API_KEY=your_sendgrid_api_key
-SENDGRID_FROM_EMAIL=no-reply@yourdomain.com
+SENDGRID_FROM=no-reply@yourdomain.com
 
+# Invitation
+INVITATION_EXPIRES_IN_DAYS=7
 ```
 
 ---
