@@ -20,5 +20,11 @@ export const MESSAGES = {
   },
   INVITATION: {
     ALREADY_PENDING: 'An invitation for this email and board is already pending',
+    NOT_FOUND: 'Invitation not found',
+    EXPIRED: 'This invitation has expired',
+    ALREADY_ACCEPTED: 'This invitation has already been accepted',
+    ALREADY_MEMBER: 'User is already a member of this board',
+    INVALID: 'This invitation is no longer valid',
+    TOKEN_REQUIRED: 'token query parameter is required',
   },
 };

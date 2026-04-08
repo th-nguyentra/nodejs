@@ -53,4 +53,51 @@ router.post(
   InvitationController.createInvitation,
 );
 
+/**
+ * @openapi
+ * /invitations/accept:
+ *   get:
+ *     tags: [Invitations]
+ *     summary: Accept a board invitation via token
+ *     description: >
+ *       Verifies the invitation token and handles two flows:
+ *       - **Has account**: adds the user to the board as a member and marks the invitation ACCEPTED.
+ *       - **No account**: returns `requiresRegistration: true` so the client can redirect to registration.
+ *       Invitations expire after the configured number of days (default 7).
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Unique invitation token from the email link
+ *     responses:
+ *       200:
+ *         description: Invitation accepted or registration required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - type: object
+ *                   description: Invitation accepted — redirect to board
+ *                   required: [boardId]
+ *                   properties:
+ *                     boardId: { type: string }
+ *                 - type: object
+ *                   description: No account — redirect to sign-up then board
+ *                   required: [requiresRegistration, email, boardId]
+ *                   properties:
+ *                     requiresRegistration: { type: boolean, example: true }
+ *                     email: { type: string }
+ *                     boardId: { type: string }
+ *               discriminator:
+ *                 propertyName: requiresRegistration
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+// NOTE: /accept must be registered before any /:id route to prevent Express matching "accept" as an id param
+router.get('/invitations/accept', InvitationController.acceptInvitation);
+
 export const InvitationRouter = router;

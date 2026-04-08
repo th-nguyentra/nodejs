@@ -18,4 +18,7 @@ export const env = {
     from: process.env.SENDGRID_FROM ?? '',
   },
   appUrl: process.env.APP_URL ?? 'http://localhost:3000',
+  invitation: {
+    expiresInDays: parseInt(process.env.INVITATION_EXPIRES_IN_DAYS ?? '7', 10),
+  },
 };
