@@ -17,4 +17,5 @@ export const env = {
     apiKey: process.env.SENDGRID_API_KEY ?? '',
     from: process.env.SENDGRID_FROM ?? '',
   },
+  appUrl: process.env.APP_URL ?? 'http://localhost:3000',
 };
