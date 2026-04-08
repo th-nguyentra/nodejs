@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+:root {
+  --trello-navy: #1D2125;
+  --trello-navy-hover: #282E33;
+  --trello-blue: #0C66E4;
+  --trello-bg: #F1F2F4;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--trello-bg);
+  color: #172B4D;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Kanban scroll */
+.kanban-board {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  align-items: flex-start;
+}
+
+.kanban-board::-webkit-scrollbar {
+  height: 8px;
+}
+.kanban-board::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+}
+.kanban-board::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.4);
+  border-radius: 4px;
+}
