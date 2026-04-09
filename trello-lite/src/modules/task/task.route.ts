@@ -180,6 +180,57 @@ router.get('/tasks', authenticate, validate(getTasksQuerySchema, 'query'), TaskC
 /**
  * @openapi
  * /tasks/{taskId}:
+ *   get:
+ *     tags: [Tasks]
+ *     summary: Get task detail
+ *     description: Returns full task detail. Admins can access any task; members can only access tasks from boards they belong to.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Task detail
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id: { type: string }
+ *                 title: { type: string }
+ *                 description: { type: string, nullable: true }
+ *                 status: { type: string, enum: [TODO, IN_PROGRESS, DONE] }
+ *                 dueDate: { type: string, format: date-time, nullable: true }
+ *                 boardId: { type: string }
+ *                 createdAt: { type: string, format: date-time }
+ *                 updatedAt: { type: string, format: date-time }
+ *                 assignee:
+ *                   type: object
+ *                   nullable: true
+ *                   properties:
+ *                     id: { type: string }
+ *                     username: { type: string }
+ *                 creator:
+ *                   type: object
+ *                   properties:
+ *                     id: { type: string }
+ *                     username: { type: string }
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.get('/tasks/:taskId', authenticate, TaskController.getTaskById);
+
+/**
+ * @openapi
+ * /tasks/{taskId}:
  *   patch:
  *     tags: [Tasks]
  *     summary: Update a task
