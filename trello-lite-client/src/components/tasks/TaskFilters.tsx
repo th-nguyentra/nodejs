@@ -44,12 +44,12 @@ export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
 
       <input
         type="date"
-        value={filters.dueDate ?? ''}
-        onChange={(e) => onChange({ ...filters, dueDate: e.target.value || undefined, page: 1 })}
+        value={filters.startDate ?? ''}
+        onChange={(e) => onChange({ ...filters, startDate: e.target.value || undefined, page: 1 })}
         className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
 
-      {(filters.status || filters.dueDate || filters.assigneeId) && (
+      {(filters.status || filters.startDate || filters.assigneeId) && (
         <Button
           variant="ghost"
           size="sm"

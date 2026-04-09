@@ -1,5 +1,6 @@
 import { Task, TaskStatus } from '@/types';
 import { KanbanCard } from './KanbanCard';
+import { Plus } from 'lucide-react';
 
 const COLUMNS: { status: TaskStatus; label: string; color: string }[] = [
   { status: 'TODO', label: 'To Do', color: '#091E42' },
@@ -7,7 +8,21 @@ const COLUMNS: { status: TaskStatus; label: string; color: string }[] = [
   { status: 'DONE', label: 'Done', color: '#006644' },
 ];
 
-export function KanbanColumns({ tasks }: { tasks: Task[] }) {
+interface KanbanColumnsProps {
+  tasks: Task[];
+  onAddTask?: (status: TaskStatus) => void;
+  onEditTask?: (task: Task) => void;
+  onDeleteTask?: (task: Task) => void;
+  isAdmin?: boolean;
+}
+
+export function KanbanColumns({
+  tasks,
+  onAddTask,
+  onEditTask,
+  onDeleteTask,
+  isAdmin,
+}: KanbanColumnsProps) {
   const byStatus = (status: TaskStatus) => tasks.filter((t) => t.status === status);
 
   return (
@@ -26,12 +41,27 @@ export function KanbanColumns({ tasks }: { tasks: Task[] }) {
               </span>
             </div>
             <div className="rounded-xl bg-[#EBECF0] p-2 flex flex-col gap-2 min-h-16">
-              {col.length === 0 && (
+              {col.length === 0 && !onAddTask && (
                 <p className="py-4 text-center text-xs text-gray-400">No tasks</p>
               )}
               {col.map((task) => (
-                <KanbanCard key={task.id} task={task} />
+                <KanbanCard
+                  key={task.id}
+                  task={task}
+                  onEdit={onEditTask}
+                  onDelete={onDeleteTask}
+                  isAdmin={isAdmin}
+                />
               ))}
+              {onAddTask && (
+                <button
+                  onClick={() => onAddTask(status)}
+                  className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-gray-500 hover:bg-white/70 hover:text-gray-700 transition"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add task
+                </button>
+              )}
             </div>
           </div>
         );
