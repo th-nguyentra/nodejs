@@ -1,7 +1,7 @@
 import { authenticate, validate } from '@/middlewares';
 import { Router } from 'express';
 import { TaskController } from './task.controller';
-import { createTaskSchema, getTasksQuerySchema } from './task.dto';
+import { createTaskSchema, getTasksQuerySchema, updateTaskSchema } from './task.dto';
 
 const router = Router();
 
@@ -176,5 +176,76 @@ router.post('/tasks', authenticate, validate(createTaskSchema), TaskController.c
  *         $ref: '#/components/responses/Unauthorized'
  */
 router.get('/tasks', authenticate, validate(getTasksQuerySchema, 'query'), TaskController.getTasks);
+
+/**
+ * @openapi
+ * /tasks/{taskId}:
+ *   patch:
+ *     tags: [Tasks]
+ *     summary: Update a task
+ *     description: Board members and admins can update tasks. If assigneeId is provided, the assignee must be a member of the board. Set assigneeId or dueDate to null to clear them.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 200
+ *               description:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [TODO, IN_PROGRESS, DONE]
+ *               assigneeId:
+ *                 type: string
+ *                 nullable: true
+ *               dueDate:
+ *                 type: string
+ *                 format: date-time
+ *                 nullable: true
+ *     responses:
+ *       200:
+ *         description: Task updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id: { type: string }
+ *                 title: { type: string }
+ *                 description: { type: string, nullable: true }
+ *                 status: { type: string, enum: [TODO, IN_PROGRESS, DONE] }
+ *                 dueDate: { type: string, format: date-time, nullable: true }
+ *                 boardId: { type: string }
+ *                 createdAt: { type: string, format: date-time }
+ *                 updatedAt: { type: string, format: date-time }
+ *                 assignee:
+ *                   type: object
+ *                   nullable: true
+ *                   properties:
+ *                     id: { type: string }
+ *                     username: { type: string }
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.patch('/tasks/:taskId', authenticate, validate(updateTaskSchema), TaskController.updateTask);
 
 export const TaskRouter = router;

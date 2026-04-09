@@ -1,5 +1,5 @@
 import { prisma } from '@/configs';
-import { CreateTaskData, FindTasksOptions } from './task.dto';
+import { CreateTaskData, FindTasksOptions, UpdateTaskDTO } from './task.dto';
 
 const buildTaskWhere = ({
   boardId,
@@ -32,6 +32,18 @@ const buildTaskWhere = ({
   return where;
 };
 
+const TASK_SELECT = {
+  id: true,
+  title: true,
+  description: true,
+  status: true,
+  dueDate: true,
+  boardId: true,
+  createdAt: true,
+  updatedAt: true,
+  assignee: { select: { id: true, username: true } },
+};
+
 export const TaskRepository = {
   createTask: (data: CreateTaskData) =>
     prisma.task.create({
@@ -39,27 +51,28 @@ export const TaskRepository = {
         boardId: data.boardId,
         title: data.title,
         description: data.description,
+        status: data.status,
         assigneeId: data.assigneeId,
-        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+        ...(data.dueDate && { dueDate: new Date(data.dueDate) }),
         createdBy: data.createdBy,
       },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        status: true,
-        dueDate: true,
-        boardId: true,
-        createdAt: true,
-        updatedAt: true,
-        assignee: { select: { id: true, username: true } },
-      },
+      select: TASK_SELECT,
     }),
 
-  isBoardMember: (boardId: string, userId: string) =>
-    prisma.boardMember.findUnique({
-      where: { boardId_userId: { boardId, userId } },
-      select: { id: true },
+  findTaskById: (id: string) =>
+    prisma.task.findUnique({
+      where: { id, deletedAt: null },
+      select: { id: true, boardId: true, assigneeId: true },
+    }),
+
+  updateTask: (id: string, data: UpdateTaskDTO) =>
+    prisma.task.update({
+      where: { id, deletedAt: null },
+      data: {
+        ...data,
+        dueDate: data.dueDate ? new Date(data.dueDate) : data.dueDate,
+      },
+      select: TASK_SELECT,
     }),
 
   findBoardIdsByUserId: (userId: string) =>
@@ -88,17 +101,7 @@ export const TaskRepository = {
         skip,
         take: limit,
         orderBy: { [sortBy]: order },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          status: true,
-          dueDate: true,
-          boardId: true,
-          createdAt: true,
-          updatedAt: true,
-          assignee: { select: { id: true, username: true } },
-        },
+        select: TASK_SELECT,
       }),
       prisma.task.count({ where }),
     ]);

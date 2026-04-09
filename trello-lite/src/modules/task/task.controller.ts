@@ -1,6 +1,6 @@
 import { HTTP_CODE } from '@/constants';
 import { Request, Response } from 'express';
-import { createTaskSchema, getTasksQuerySchema } from './task.dto';
+import { createTaskSchema, getTasksQuerySchema, updateTaskSchema } from './task.dto';
 import { TaskService } from './task.service';
 
 export const TaskController = {
@@ -9,6 +9,13 @@ export const TaskController = {
     const result = await TaskService.createTask(data, req.user!);
 
     res.status(HTTP_CODE.CREATED).json(result);
+  },
+
+  updateTask: async (req: Request, res: Response) => {
+    const data = updateTaskSchema.parse(req.body);
+    const result = await TaskService.updateTask(req.params.taskId as string, data, req.user!);
+
+    res.status(HTTP_CODE.OK).json(result);
   },
 
   getTasks: async (req: Request, res: Response) => {
