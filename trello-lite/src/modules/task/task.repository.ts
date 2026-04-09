@@ -1,5 +1,5 @@
 import { prisma } from '@/configs';
-import { FindTasksOptions } from './task.dto';
+import { CreateTaskData, FindTasksOptions } from './task.dto';
 
 const buildTaskWhere = ({
   boardId,
@@ -33,6 +33,35 @@ const buildTaskWhere = ({
 };
 
 export const TaskRepository = {
+  createTask: (data: CreateTaskData) =>
+    prisma.task.create({
+      data: {
+        boardId: data.boardId,
+        title: data.title,
+        description: data.description,
+        assigneeId: data.assigneeId,
+        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+        createdBy: data.createdBy,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        dueDate: true,
+        boardId: true,
+        createdAt: true,
+        updatedAt: true,
+        assignee: { select: { id: true, username: true } },
+      },
+    }),
+
+  isBoardMember: (boardId: string, userId: string) =>
+    prisma.boardMember.findUnique({
+      where: { boardId_userId: { boardId, userId } },
+      select: { id: true },
+    }),
+
   findBoardIdsByUserId: (userId: string) =>
     prisma.boardMember.findMany({
       where: { userId },
