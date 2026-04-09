@@ -84,6 +84,12 @@ export const TaskRepository = {
       select: TASK_SELECT,
     }),
 
+  deleteTask: (id: string) =>
+    prisma.task.update({
+      where: { id, deletedAt: null },
+      data: { deletedAt: new Date() },
+    }),
+
   findBoardIdsByUserId: (userId: string) =>
     prisma.boardMember.findMany({
       where: { userId },
