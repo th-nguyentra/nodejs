@@ -22,6 +22,7 @@ export const MESSAGES = {
     NOT_FOUND: 'Task not found',
     BOARD_ACCESS_DENIED: 'You do not have access to this board',
     ASSIGNEE_NOT_MEMBER: 'Assignee is not a member of this board',
+    STATUS_CHANGE_FORBIDDEN: 'Only the assignee can change the task status',
   },
   INVITATION: {
     ALREADY_PENDING: 'An invitation for this email and board is already pending',

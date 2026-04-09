@@ -81,6 +81,15 @@ export const BoardRepository = {
       }),
     ]),
 
+  boardExists: (id: string) =>
+    prisma.board.findUnique({ where: { id, deletedAt: null }, select: { id: true } }),
+
+  isBoardMember: (boardId: string, userId: string) =>
+    prisma.boardMember.findUnique({
+      where: { boardId_userId: { boardId, userId } },
+      select: { id: true },
+    }),
+
   findBoards: ({ search, page, limit, userId }: FindBoardsOptions) => {
     const where = buildBoardWhere({ search, userId });
     const skip = (page - 1) * limit;

@@ -2,47 +2,56 @@ import { Role } from '../../../generated/prisma/client';
 import { MESSAGES } from '@/constants';
 import { ApiError } from '@/utils/api-error';
 import { BoardRepository } from '../board/board.repository';
-import { CreateTaskDTO, GetTasksQuery } from './task.dto';
+import { CreateTaskDTO, GetTasksQuery, UpdateTaskDTO } from './task.dto';
 import { TaskRepository } from './task.repository';
+
+const validateBoardAccess = async (
+  boardId: string,
+  user: { id: string; role: Role },
+  assigneeId?: string | null,
+) => {
+  const checkUser =
+    user.role !== Role.ADMIN ? BoardRepository.isBoardMember(boardId, user.id) : null;
+  const checkAssignee = assigneeId ? BoardRepository.isBoardMember(boardId, assigneeId) : null;
+
+  const [membership, assigneeMembership] = await Promise.all([checkUser, checkAssignee]);
+
+  if (checkUser && !membership) throw ApiError.forbidden(MESSAGES.TASK.BOARD_ACCESS_DENIED);
+  if (checkAssignee && !assigneeMembership)
+    throw ApiError.badRequest(MESSAGES.TASK.ASSIGNEE_NOT_MEMBER);
+};
 
 export const TaskService = {
   createTask: async (data: CreateTaskDTO, user: { id: string; role: Role }) => {
-    const isAdmin = user.role === Role.ADMIN;
-
-    // Ensure the board exists
-    const board = await BoardRepository.findBoardById(data.boardId);
+    const board = await BoardRepository.boardExists(data.boardId);
     if (!board) throw ApiError.notFound(MESSAGES.BOARD.NOT_FOUND);
 
-    // Members can only create tasks on boards they belong to
-    if (!isAdmin) {
-      const membership = await TaskRepository.isBoardMember(data.boardId, user.id);
-      if (!membership) throw ApiError.forbidden(MESSAGES.TASK.BOARD_ACCESS_DENIED);
-    }
-
-    // Assignee must be a member of the board
-    if (data.assigneeId) {
-      const assigneeMembership = await TaskRepository.isBoardMember(data.boardId, data.assigneeId);
-      if (!assigneeMembership) throw ApiError.badRequest(MESSAGES.TASK.ASSIGNEE_NOT_MEMBER);
-    }
+    await validateBoardAccess(data.boardId, user, data.assigneeId);
 
     return TaskRepository.createTask({ ...data, createdBy: user.id });
+  },
+
+  updateTask: async (taskId: string, data: UpdateTaskDTO, user: { id: string; role: Role }) => {
+    const task = await TaskRepository.findTaskById(taskId);
+    if (!task) throw ApiError.notFound(MESSAGES.TASK.NOT_FOUND);
+
+    await validateBoardAccess(task.boardId, user, data.assigneeId);
+
+    if (data.status && user.role !== Role.ADMIN && user.id !== task.assigneeId) {
+      throw ApiError.forbidden(MESSAGES.TASK.STATUS_CHANGE_FORBIDDEN);
+    }
+
+    return TaskRepository.updateTask(taskId, data);
   },
 
   getTasks: async (query: GetTasksQuery, user: { id: string; role: Role }) => {
     const isAdmin = user.role === Role.ADMIN;
 
-    // Members must filter by a specific board they belong to
     if (!isAdmin) {
-      if (!query.boardId) {
-        throw ApiError.forbidden(MESSAGES.TASK.BOARD_ACCESS_DENIED);
-      }
+      if (!query.boardId) throw ApiError.forbidden(MESSAGES.TASK.BOARD_ACCESS_DENIED);
 
-      const memberships = await TaskRepository.findBoardIdsByUserId(user.id);
-      const allowedBoardIds = memberships.map((member) => member.boardId);
-
-      if (!allowedBoardIds.includes(query.boardId)) {
-        throw ApiError.forbidden(MESSAGES.TASK.BOARD_ACCESS_DENIED);
-      }
+      const membership = await BoardRepository.isBoardMember(query.boardId, user.id);
+      if (!membership) throw ApiError.forbidden(MESSAGES.TASK.BOARD_ACCESS_DENIED);
     }
 
     const [tasks, total] = await TaskRepository.findTasks(query);
