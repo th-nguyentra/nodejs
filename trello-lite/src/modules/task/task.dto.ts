@@ -2,6 +2,17 @@ import { z } from 'zod';
 import { DEFAULT_PAGE, MAX_LIMIT } from '@/constants';
 import { TaskStatus } from 'generated/prisma/client';
 
+export const createTaskSchema = z.object({
+  boardId: z.string().min(1),
+  title: z.string().min(1).max(200),
+  description: z.string().optional(),
+  assigneeId: z.string().optional(),
+  dueDate: z.iso.datetime().optional(),
+});
+
+export type CreateTaskDTO = z.infer<typeof createTaskSchema>;
+export type CreateTaskData = CreateTaskDTO & { createdBy: string };
+
 export const getTasksQuerySchema = z.object({
   boardId: z.string().optional(),
   assigneeId: z.string().optional(),
