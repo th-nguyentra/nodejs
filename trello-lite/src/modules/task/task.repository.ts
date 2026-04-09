@@ -65,6 +65,15 @@ export const TaskRepository = {
       select: { id: true, boardId: true, assigneeId: true },
     }),
 
+  findTaskDetail: (id: string) =>
+    prisma.task.findUnique({
+      where: { id, deletedAt: null },
+      select: {
+        ...TASK_SELECT,
+        creator: { select: { id: true, username: true } },
+      },
+    }),
+
   updateTask: (id: string, data: UpdateTaskDTO) =>
     prisma.task.update({
       where: { id, deletedAt: null },

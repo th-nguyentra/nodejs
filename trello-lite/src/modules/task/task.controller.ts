@@ -18,6 +18,11 @@ export const TaskController = {
     res.status(HTTP_CODE.OK).json(result);
   },
 
+  getTaskById: async (req: Request, res: Response) => {
+    const result = await TaskService.getTaskById(req.params.taskId as string, req.user!);
+    res.status(HTTP_CODE.OK).json(result);
+  },
+
   getTasks: async (req: Request, res: Response) => {
     const query = getTasksQuerySchema.parse(req.query);
     const result = await TaskService.getTasks(query, req.user!);

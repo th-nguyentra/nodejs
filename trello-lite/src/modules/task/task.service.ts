@@ -44,6 +44,18 @@ export const TaskService = {
     return TaskRepository.updateTask(taskId, data);
   },
 
+  getTaskById: async (taskId: string, user: { id: string; role: Role }) => {
+    const task = await TaskRepository.findTaskDetail(taskId);
+    if (!task) throw ApiError.notFound(MESSAGES.TASK.NOT_FOUND);
+
+    if (user.role !== Role.ADMIN) {
+      const membership = await BoardRepository.isBoardMember(task.boardId, user.id);
+      if (!membership) throw ApiError.forbidden(MESSAGES.TASK.BOARD_ACCESS_DENIED);
+    }
+
+    return task;
+  },
+
   getTasks: async (query: GetTasksQuery, user: { id: string; role: Role }) => {
     const isAdmin = user.role === Role.ADMIN;
 
