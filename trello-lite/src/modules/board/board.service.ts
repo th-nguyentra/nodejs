@@ -39,13 +39,7 @@ export const BoardService = {
       throw ApiError.forbidden(MESSAGES.BOARD.NOT_FOUND);
     }
 
-    return {
-      id: board.id,
-      name: board.name,
-      description: board.description,
-      createdAt: board.createdAt,
-      updatedAt: board.updatedAt,
-    };
+    return board;
   },
 
   getBoards: async (query: GetBoardsQuery, user: { id: string; role: Role }) => {

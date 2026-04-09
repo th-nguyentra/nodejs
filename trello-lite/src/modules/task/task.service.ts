@@ -44,6 +44,15 @@ export const TaskService = {
     return TaskRepository.updateTask(taskId, data);
   },
 
+  deleteTask: async (taskId: string, user: { id: string; role: Role }) => {
+    if (user.role !== Role.ADMIN) throw ApiError.forbidden(MESSAGES.FORBIDDEN);
+
+    const task = await TaskRepository.findTaskById(taskId);
+    if (!task) throw ApiError.notFound(MESSAGES.TASK.NOT_FOUND);
+
+    await TaskRepository.deleteTask(taskId);
+  },
+
   getTaskById: async (taskId: string, user: { id: string; role: Role }) => {
     const task = await TaskRepository.findTaskDetail(taskId);
     if (!task) throw ApiError.notFound(MESSAGES.TASK.NOT_FOUND);

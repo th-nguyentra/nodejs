@@ -18,6 +18,11 @@ export const TaskController = {
     res.status(HTTP_CODE.OK).json(result);
   },
 
+  deleteTask: async (req: Request, res: Response) => {
+    await TaskService.deleteTask(req.params.taskId as string, req.user!);
+    res.status(HTTP_CODE.NO_CONTENT).send();
+  },
+
   getTaskById: async (req: Request, res: Response) => {
     const result = await TaskService.getTaskById(req.params.taskId as string, req.user!);
     res.status(HTTP_CODE.OK).json(result);

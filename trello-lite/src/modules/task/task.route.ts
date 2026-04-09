@@ -299,4 +299,31 @@ router.get('/tasks/:taskId', authenticate, TaskController.getTaskById);
  */
 router.patch('/tasks/:taskId', authenticate, validate(updateTaskSchema), TaskController.updateTask);
 
+/**
+ * @openapi
+ * /tasks/{taskId}:
+ *   delete:
+ *     tags: [Tasks]
+ *     summary: Delete a task (Admin only)
+ *     description: Soft-deletes the task.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Task deleted successfully
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.delete('/tasks/:taskId', authenticate, TaskController.deleteTask);
+
 export const TaskRouter = router;
