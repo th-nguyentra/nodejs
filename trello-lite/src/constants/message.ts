@@ -18,6 +18,10 @@ export const MESSAGES = {
   BOARD: {
     NOT_FOUND: 'Board not found',
   },
+  TASK: {
+    NOT_FOUND: 'Task not found',
+    BOARD_ACCESS_DENIED: 'You do not have access to this board',
+  },
   INVITATION: {
     ALREADY_PENDING: 'An invitation for this email and board is already pending',
     NOT_FOUND: 'Invitation not found',
