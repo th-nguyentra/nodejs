@@ -5,8 +5,9 @@ const config: JestConfigWithTsJest = {
   testEnvironment: 'node',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^generated/(.*)$': '<rootDir>/generated/$1',
   },
-  testMatch: ['**/__tests__/**/*.spec.ts'],
+  testMatch: ['<rootDir>/tests/**/*.spec.ts'],
   maxWorkers: 1,
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }],

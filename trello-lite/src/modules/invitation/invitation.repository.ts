@@ -23,6 +23,7 @@ export const InvitationRepository = {
         status: InvitationStatus.PENDING,
       },
       select: {
+        id: true,
         board: { select: { name: true } },
         sender: { select: { username: true } },
       },

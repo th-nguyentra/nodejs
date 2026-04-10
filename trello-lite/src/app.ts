@@ -9,33 +9,35 @@ import { BoardRouter } from './modules/board/board.route';
 import { InvitationRouter } from './modules/invitation/invitation.route';
 import { TaskRouter } from './modules/task/task.route';
 
-const app = express();
+export const createServer = () => {
+  const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+  // Middleware
+  app.use(cors());
+  app.use(express.json());
 
-// Format JSON response
-app.set('json spaces', 2);
+  // Format JSON response
+  app.set('json spaces', 2);
 
-// Logging
-app.use(requestLogger);
+  // Logging
+  app.use(requestLogger);
 
-// Passport
-app.use(passport.initialize());
+  // Passport
+  app.use(passport.initialize());
 
-// Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  // Swagger UI
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Routes
-app.use('/api/v1', AuthRouter);
-app.use('/api/v1', BoardRouter);
-app.use('/api/v1', InvitationRouter);
-app.use('/api/v1', TaskRouter);
+  // Routes
+  app.use('/api/v1', AuthRouter);
+  app.use('/api/v1', BoardRouter);
+  app.use('/api/v1', InvitationRouter);
+  app.use('/api/v1', TaskRouter);
 
-// Global error handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  errorHandler(err, req, res, next);
-});
+  // Global error handler
+  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    errorHandler(err, req, res, next);
+  });
 
-export default app;
+  return app;
+};
