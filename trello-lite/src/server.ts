@@ -1,5 +1,7 @@
-import app from './app';
+import { createServer } from './app';
 import { env, logger, prisma } from '@/configs';
+
+const app = createServer();
 
 prisma
   .$connect()

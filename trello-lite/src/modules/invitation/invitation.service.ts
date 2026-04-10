@@ -51,6 +51,8 @@ export const InvitationService = {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       logger.error(`Failed to send invitation email to ${data.email}: ${message}`);
+      await InvitationRepository.updateStatus(invitation.id, InvitationStatus.CANCELLED);
+      throw ApiError.internal(MESSAGES.INVITATION.EMAIL_FAILED);
     }
   },
 

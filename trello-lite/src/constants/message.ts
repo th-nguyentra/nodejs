@@ -32,5 +32,6 @@ export const MESSAGES = {
     ALREADY_MEMBER: 'User is already a member of this board',
     INVALID: 'This invitation is no longer valid',
     TOKEN_REQUIRED: 'token query parameter is required',
+    EMAIL_FAILED: 'Failed to send invitation email. Please try again.',
   },
 };
